@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{c0a458ca-cccc-4ea2-b224-e9a7a964c7ac}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>gui.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="classes\imagem.py" />
+    <Compile Include="classes\__init__.py" />
+    <Compile Include="gui.py" />
+    <Compile Include="modulos\cores.py" />
+    <Compile Include="modulos\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="imagens\a.png" />
+    <Content Include="imagens\aberturaIris.png" />
+    <Content Include="imagens\andre.jpg" />
+    <Content Include="imagens\Angelina.jpg" />
+    <Content Include="imagens\aviao.jpg" />
+    <Content Include="imagens\azulado.png" />
+    <Content Include="imagens\binarias\000.png" />
+    <Content Include="imagens\binarias\001.png" />
+    <Content Include="imagens\binarias\002.png" />
+    <Content Include="imagens\binarias\b.png" />
+    <Content Include="imagens\binarias\besouro.png" />
+    <Content Include="imagens\binarias\bola.png" />
+    <Content Include="imagens\binarias\caminhando.png" />
+    <Content Include="imagens\binarias\elipse.png" />
+    <Content Include="imagens\binarias\frente.png" />
+    <Content Include="imagens\binarias\homem.png" />
+    <Content Include="imagens\binarias\m1.png" />
+    <Content Include="imagens\binarias\m2.png" />
+    <Content Include="imagens\binarias\m3.png" />
+    <Content Include="imagens\binarias\m4.png" />
+    <Content Include="imagens\binarias\m5.png" />
+    <Content Include="imagens\binarias\naoSei.png" />
+    <Content Include="imagens\binarias\osso.png" />
+    <Content Include="imagens\Brad.jpg" />
+    <Content Include="imagens\camboriu.png" />
+    <Content Include="imagens\clown.gif" />
+    <Content Include="imagens\clown.jpg" />
+    <Content Include="imagens\fruits-700.jpg" />
+    <Content Include="imagens\horizonte.jpg" />
+    <Content Include="imagens\Io.jpg" />
+    <Content Include="imagens\Lenna.jpg" />
+    <Content Include="imagens\morangos.jpg" />
+    <Content Include="imagens\morangosAlfa.png" />
+    <Content Include="imagens\passaroMed.png" />
+    <Content Include="imagens\piscina.jpg" />
+    <Content Include="imagens\praia01.jpg" />
+    <Content Include="imagens\praia02-neg.png" />
+    <Content Include="imagens\praia02.png" />
+    <Content Include="imagens\predio.jpg" />
+    <Content Include="imagens\ufvNoite.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="classes" />
+    <Folder Include="imagens" />
+    <Folder Include="imagens\binarias" />
+    <Folder Include="modulos" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
