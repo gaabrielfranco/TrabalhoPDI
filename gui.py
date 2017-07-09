@@ -97,6 +97,9 @@ class Gui(Frame):
         # Menu Imagem e suas opcoes
         self.menuImagem = Menu(self.menubar)
 
+        self.submenuDominioFreq = Menu(self.menuImagem)
+        self.submenuDominioFreq.add_command(label='Erosão', underline=0, command=lambda:self.frequencia('butterworth'))
+
         self.submenuEspaciais = Menu(self.menuImagem)
         self.submenuEspaciais.add_command(label='Erosão', underline=0, command=lambda:self.espaciais('erosao'))
         self.submenuEspaciais.add_command(label='Dilatação', underline=0, command=lambda:self.espaciais('dilatacao'))
@@ -171,6 +174,7 @@ class Gui(Frame):
         self.menuImagem.add_cascade(label='Operações ponto a ponto', underline=0, menu=self.submenuOperacoesPP)
         self.menuImagem.add_cascade(label='Suavização', underline=0, menu=self.submenuSuavicacao)
         self.menuImagem.add_cascade(label='Filtros espaciais', underline=0, menu=self.submenuEspaciais)
+        self.menuImagem.add_cascade(label='Filtros no domínio da frequência', underline=0, menu=self.submenuDominioFreq)
         self.menubar.add_cascade(label="Imagem", underline=0, menu=self.menuImagem)
 
         # Menu de operacoes sobre cores e suas opcoes
@@ -1071,6 +1075,15 @@ class Gui(Frame):
                     elif metodo == 'vidro2':
                         self.img = Imagem.espaciais(self.img, 'vidro2', self.raio)
                 self.refreshImg()
+            except Exception as e:
+                tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
+
+    def frequencia(self, metodo = 'butterworth'):
+        if self.arqImg.get() == '' or self.img is None:
+            tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
+        else:
+            try:
+                self.imgOld = self.img
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
 
