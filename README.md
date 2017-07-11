@@ -7,7 +7,7 @@ Esse software é implementado em Python3 utilizando o pacote Anaconda. Segue os l
   - [Download do Python3][ps]
   - [Download do Anaconda][as]
 
-### Execução
+# Execução
 
 ```sh
 $ python gui.py
