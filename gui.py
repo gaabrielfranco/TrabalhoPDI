@@ -98,7 +98,7 @@ class Gui(Frame):
         self.menuImagem = Menu(self.menubar)
 
         self.submenuDominioFreq = Menu(self.menuImagem)
-        self.submenuDominioFreq.add_command(label='Erosão', underline=0, command=lambda:self.frequencia('butterworth'))
+        self.submenuDominioFreq.add_command(label='Butterworth', underline=0, command=lambda:self.frequencia('butterworth'))
 
         self.submenuEspaciais = Menu(self.menuImagem)
         self.submenuEspaciais.add_command(label='Erosão', underline=0, command=lambda:self.espaciais('erosao'))
@@ -1084,6 +1084,8 @@ class Gui(Frame):
         else:
             try:
                 self.imgOld = self.img
+                self.img = Imagem.frequencia(self.img, metodo)
+                self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
 
