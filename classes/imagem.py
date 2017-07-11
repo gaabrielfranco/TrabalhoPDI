@@ -1251,36 +1251,49 @@ class Imagem(object):
             
             return nova
 
-    def frequencia(self, metodo):
+    def frequencia(self, metodo, raio = 127.0, ordem = 8, raio2 = 10.0):
         nova = Imagem((self.altura, self.largura))
-        if metodo == 'butterworth':
-            raio = 127.0
-            ordem = 8
-            imgFreq = fftn(self.arr())
-            #print(imgFreq[0][0][0], imgFreq[0][0][1], imgFreq[0][0][2])
-            #print(np.allclose(imgFreq, fftn(ifftn(imgFreq))))
-            imgFreq = fftshift(imgFreq)
-            u0 = self.altura // 2
-            v0 = self.largura // 2
 
-            for i in range(self.altura):
-                for j in range(self.largura):
-                    #distR = math.sqrt(float(imgFreq[i][j][0] - imgFreq[0][0][0]) ** 2)
-                    #distG = math.sqrt(float(imgFreq[i][j][1] - imgFreq[0][0][1]) ** 2)
-                    #distB = math.sqrt(float(imgFreq[i][j][2] - imgFreq[0][0][2]) ** 2)
-                    dist = math.sqrt((i - u0) ** 2 + (j - v0) ** 2)
-                    #dist = (i - u0) + (j - v0)
+        imgFreq = fftn(self.arr())
+        imgFreq = fftshift(imgFreq)
+        u0 = self.altura // 2
+        v0 = self.largura // 2
+
+        for i in range(self.altura):
+            for j in range(self.largura):
+                dist = math.sqrt((i - u0) ** 2 + (j - v0) ** 2)
+
+                #Pra não ocorrer divisão por zero no butterworth passa alta
+                if dist == 0.0 and metodo == 'butterworthPA':
+                    dist += 0.000001
+
+                if metodo == 'butterworthPB':
                     imgFreq[i][j][0] *= 1 / (1 + ((dist / raio) ** (2 * ordem)))
                     imgFreq[i][j][1] *= 1 / (1 + ((dist / raio) ** (2 * ordem)))
                     imgFreq[i][j][2] *= 1 / (1 + ((dist / raio) ** (2 * ordem)))
+                elif metodo == 'butterworthPA':
+                    imgFreq[i][j][0] *= 1 / (1 + ((raio / dist) ** (2 * ordem)))
+                    imgFreq[i][j][1] *= 1 / (1 + ((raio / dist) ** (2 * ordem)))
+                    imgFreq[i][j][2] *= 1 / (1 + ((raio / dist) ** (2 * ordem)))
+                elif metodo == 'passa-baixa':
+                    if dist > raio:
+                        imgFreq[i][j] = (0, 0, 0)
+                elif metodo == 'passa-alta':
+                    if dist <= raio:
+                        imgFreq[i][j] = (0, 0, 0)
+                else:
+                    #passa-faixa
+                    if dist < min(raio, raio2) or dist > max(raio, raio2):
+                        imgFreq[i][j] = (0, 0, 0)
 
-            imgFreq = ifftshift(imgFreq)
-            imgFreq = ifftn(imgFreq)
+        imgFreq = ifftshift(imgFreq)
+        imgFreq = ifftn(imgFreq)
 
 
-            for i in range(self.altura):
-                for j in range(self.largura):
-                    nova[i][j] = (imgFreq[i][j][0], imgFreq[i][j][1], imgFreq[i][j][2])
+        #Voltar a imagem pro domínio do espaço
+        for i in range(self.altura):
+            for j in range(self.largura):
+                nova[i][j] = (imgFreq[i][j][0], imgFreq[i][j][1], imgFreq[i][j][2])
 
         return nova
  

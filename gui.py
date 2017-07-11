@@ -98,7 +98,11 @@ class Gui(Frame):
         self.menuImagem = Menu(self.menubar)
 
         self.submenuDominioFreq = Menu(self.menuImagem)
-        self.submenuDominioFreq.add_command(label='Butterworth', underline=0, command=lambda:self.frequencia('butterworth'))
+        self.submenuDominioFreq.add_command(label='Filtro passa-baixa', underline=0, command=lambda:self.frequencia('passa-baixa'))
+        self.submenuDominioFreq.add_command(label='Filtro passa-alta', underline=0, command=lambda:self.frequencia('passa-alta'))
+        self.submenuDominioFreq.add_command(label='Filtro passa-faixa', underline=0, command=lambda:self.frequencia('passa-faixa'))
+        self.submenuDominioFreq.add_command(label='Butterworth passa-baixa', underline=0, command=lambda:self.frequencia('butterworthPB'))
+        self.submenuDominioFreq.add_command(label='Butterworth passa-alta', underline=0, command=lambda:self.frequencia('butterworthPA'))
 
         self.submenuEspaciais = Menu(self.menuImagem)
         self.submenuEspaciais.add_command(label='Erosão', underline=0, command=lambda:self.espaciais('erosao'))
@@ -601,7 +605,6 @@ class Gui(Frame):
             tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
         else:
             try:
-                #qualquer coisa volta pra imgOld
                 self.imgOld = self.img
                 self.imagem = cor.mudaCor(self.img, 'luminosity')
                 Imagem.visualizacaoHistogramas(self.img, self.imagem)
@@ -645,7 +648,6 @@ class Gui(Frame):
                 self.formEspecificacaoDiretaHistograma()
                 self.wait_window(self.w)
                 if self.Resposta is not None:
-                    #mudei aqui
                     self.imgOld = self.img
                     if self.Resposta == 'sim':
                         self.imagem = cor.mudaCor(self.img, 'luminosity')
@@ -951,7 +953,6 @@ class Gui(Frame):
             tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
         else:
             try:
-                #mudei aqui
                 self.load_file('Arquivos de Imagem', self.arqImg, self.tipos)
                 self.imgOld = self.img
                 self.imagem = Imagem(self.arqImg.get())
@@ -1039,15 +1040,11 @@ class Gui(Frame):
                 self.formRaio()
                 self.wait_window(self.w)
 
-                if metodo == 'media':
-                    self.img = Imagem.suavizacao(self.img, 'media', self.raio)
-                elif metodo == 'gaausiana':
-                    self.img = Imagem.suavizacao(self.img, 'gaausiana', self.raio)
-                elif metodo == 'mediana':
-                    self.img = Imagem.suavizacao(self.img, 'mediana', self.raio)
-                elif metodo == 'conservativa':
+                if metodo == 'conservativa':
                     nova = cor.mudaCor(self.img, 'luminosity')
                     self.img = Imagem.suavizacao(self.img, 'conservativa', self.raio, nova)
+                else:
+                    self.img = Imagem.suavizacao(self.img, metodo, self.raio)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
@@ -1061,24 +1058,16 @@ class Gui(Frame):
                 if metodo == 'pixelizacao':
                     self.formBloco()
                     self.wait_window(self.w)
-                    self.img = Imagem.espaciais(self.img, 'pixelizacao', self.raio)
+                    self.img = Imagem.espaciais(self.img, metodo, self.raio)
                 else:
                     self.formRaio()
                     self.wait_window(self.w)
-
-                    if metodo == 'erosao':
-                        self.img = Imagem.espaciais(self.img, 'erosao', self.raio)
-                    elif metodo == 'dilatacao':
-                        self.img = Imagem.espaciais(self.img, 'dilatacao', self.raio)
-                    elif metodo == 'vidro1':
-                        self.img = Imagem.espaciais(self.img, 'vidro1', self.raio)
-                    elif metodo == 'vidro2':
-                        self.img = Imagem.espaciais(self.img, 'vidro2', self.raio)
+                    self.img = Imagem.espaciais(self.img, metodo, self.raio)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
 
-    def frequencia(self, metodo = 'butterworth'):
+    def frequencia(self, metodo):
         if self.arqImg.get() == '' or self.img is None:
             tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
         else:
