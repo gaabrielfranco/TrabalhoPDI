@@ -778,8 +778,9 @@ class Gui(Frame):
             tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
         else:
             try:
-                self.imgOld = cor.mudaCor(self.img, 'luminosity')
-                self.img = cor.quantizacaoCores(self.imgOld, 'uniforme', 4)
+                self.imgOld = self.img
+                self.imagem = cor.mudaCor(self.img, 'luminosity')
+                self.img = cor.quantizacaoCores(self.imagem, 'uniforme', 4)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
@@ -1074,6 +1075,17 @@ class Gui(Frame):
             try:
                 self.imgOld = self.img
                 self.img = Imagem.frequencia(self.img, metodo)
+                self.refreshImg()
+            except Exception as e:
+                tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
+
+    def limiarizacao(self, metodo):
+        if self.arqImg.get() == '' or self.img is None:
+            tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
+        else:
+            try:
+                self.imgOld = self.img
+                self.img = Imagem.limiarizacao(cor.mudaCor(self.img, 'luminosity'), metodo)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
