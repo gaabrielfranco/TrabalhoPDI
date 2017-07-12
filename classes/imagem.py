@@ -1296,4 +1296,53 @@ class Imagem(object):
                 nova[i][j] = (imgFreq[i][j][0], imgFreq[i][j][1], imgFreq[i][j][2])
 
         return nova
- 
+
+    def limiarizacao(self, metodo):
+        #Passo 1 (Estimativa inicial pro limiar T)
+        Tmin = 256; Tmax = -1
+        nova = Imagem((self.altura, self.largura))
+        for i in range(self.altura):
+            for j in range(self.largura):
+                r, g, b = self.img.getpixel((i, j))
+                #Luminosity
+                intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                if intensidade < Tmax:
+                    Tmin = intensidade
+                if intensidade > Tmax:
+                    Tmax = intensidade
+        T = (Tmax + Tmin) // 2
+        #Passo 2, 3, e 4 
+        u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0; nIteracoes = 0; deltaT = 1; Tant = 0
+        while abs(Tant - T) > deltaT:
+            for i in range(self.altura):
+                for j in range(self.largura):
+                    r, g, b = self.img.getpixel((i, j))
+                    #Luminosity
+                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                    if intensidade <= T:
+                        u1 += intensidade
+                        n1 += 1
+                    else:
+                        u2 += intensidade
+                        n2 += 1
+            u1 = u1 / n1
+            u2 = u2 / n2
+            nIteracoes += 1
+            Tant = T
+            T = (u1 + u2) // 2
+            u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0
+
+        #Passo 5 (nova Imagem)
+        for i in range(self.altura):
+            for j in range(self.largura):
+                r, g, b = self.img.getpixel((i, j))
+                #Luminosity
+                intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                if intensidade >= T:
+                    nova[i][j] = (0, 0, 0)
+                else:
+                    nova[i][j] = (255, 255, 255)
+
+        return nova
+
+

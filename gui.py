@@ -32,7 +32,11 @@ class Gui(Frame):
 #==============================================================================
 
     def __init__(self, parent=None):
-        parent.bind("<Control-z>", self.key)
+        parent.bind("<Control-z>", self.ctrl_z)
+        parent.bind("<Control-s>", self.ctrl_s)
+        parent.bind("<Control-o>", self.ctrl_o)
+        parent.bind("<Escape>", self.esc)
+        parent.bind("<Control-Shift-KeyPress-S>", self.ctrl_shift_s)
         Frame.__init__(self, parent)
         # Atributos GUI
         self.parent = parent
@@ -69,8 +73,23 @@ class Gui(Frame):
 #     Metodos relacionados ao comportamento da GUI
 #==============================================================================
     
-    def key(self, event):
+    def ctrl_z(self, event):
         self.desfazer()
+
+    def ctrl_s(self, event):
+        self.salvar()
+
+    def ctrl_shift_s(self, event):
+        self.salvarComo()
+
+    def ctrl_o(self, event):
+        self.abrir()
+
+    def esc(self, event):
+        self.fecharArquivo()
+
+    def ctrl_shift_s(self, event):
+        self.salvarComo()
     
     def createWidgets(self):
         self.canvas = Canvas(self.parent, width=1366, height=768)
@@ -85,22 +104,25 @@ class Gui(Frame):
 
         # Menu arquivo e suas opcoes
         self.menuArquivo = Menu(self.menubar)
-        self.menuArquivo.add_command(label='Abrir', underline=0, command=self.abrir)
+        self.menuArquivo.add_command(label='Abrir                                Ctrl+O', underline=0, command=self.abrir)
         self.menuArquivo.add_separator()
-        self.menuArquivo.add_command(label='Salvar', underline=0, command=self.salvar)
-        self.menuArquivo.add_command(label='Salvar Como...', underline=0, command=self.salvarComo)
+        self.menuArquivo.add_command(label='Salvar                              Ctrl+S', underline=0, command=self.salvar)
+        self.menuArquivo.add_command(label='Salvar Como...               Ctrl+Shift+S', underline=0, command=self.salvarComo)
         self.menuArquivo.add_separator()
-        self.menuArquivo.add_command(label='Fechar imagem(ns)', underline=0, command=self.fecharArquivo)
-        self.menuArquivo.add_command(label="Sair", underline=3, command=self.onExit)
+        self.menuArquivo.add_command(label='Fechar imagem(ns)       Esc', underline=0, command=self.fecharArquivo)
+        self.menuArquivo.add_command(label='Sair                                  Alt+F4', underline=3, command=self.onExit)
         self.menubar.add_cascade(label="Arquivo", underline=0, menu=self.menuArquivo)
 
         # Menu editar e suas opcoes
         self.menuEditar = Menu(self.menubar)
-        self.menuEditar.add_command(label='Desfazer     Ctrl+Z', underline=0, command=self.desfazer)
+        self.menuEditar.add_command(label='Desfazer                    Ctrl+Z', underline=0, command=self.desfazer)
         self.menubar.add_cascade(label="Editar", underline=0, menu=self.menuEditar)
 
         # Menu Imagem e suas opcoes
         self.menuImagem = Menu(self.menubar)
+
+        self.submenuLimiarizacao = Menu(self.menuImagem)
+        self.submenuLimiarizacao.add_command(label='Global adaptativa', underline=0, command=lambda:self.limiarizacao('global'))
 
         self.submenuDominioFreq = Menu(self.menuImagem)
         self.submenuDominioFreq.add_command(label='Filtro passa-baixa', underline=0, command=lambda:self.frequencia('passa-baixa'))
@@ -184,6 +206,7 @@ class Gui(Frame):
         self.menuImagem.add_cascade(label='Suavização', underline=0, menu=self.submenuSuavicacao)
         self.menuImagem.add_cascade(label='Filtros espaciais', underline=0, menu=self.submenuEspaciais)
         self.menuImagem.add_cascade(label='Filtros no domínio da frequência', underline=0, menu=self.submenuDominioFreq)
+        self.menuImagem.add_cascade(label='Limiarização', underline=0, menu=self.submenuLimiarizacao)
         self.menubar.add_cascade(label="Imagem", underline=0, menu=self.menuImagem)
 
         # Menu de operacoes sobre cores e suas opcoes
@@ -1090,7 +1113,7 @@ class Gui(Frame):
         else:
             try:
                 self.imgOld = self.img
-                self.img = Imagem.limiarizacao(cor.mudaCor(self.img, 'luminosity'), metodo)
+                self.img = Imagem.limiarizacao(self.img, metodo)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
@@ -1105,4 +1128,5 @@ top.geometry("%dx%d+0+0" % (w,h))
 
 # Executa em loop ate janela ser fechada
 mainw = Gui(parent=top)
+#mainw.master.iconbitmap('imagens\\icon.ico')
 mainw.mainloop()
