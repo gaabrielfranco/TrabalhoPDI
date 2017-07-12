@@ -30,7 +30,9 @@ class Gui(Frame):
 #==============================================================================
 #     Metodos Basicos
 #==============================================================================
+
     def __init__(self, parent=None):
+        parent.bind("<Control-z>", self.key)
         Frame.__init__(self, parent)
         # Atributos GUI
         self.parent = parent
@@ -66,7 +68,10 @@ class Gui(Frame):
 #==============================================================================
 #     Metodos relacionados ao comportamento da GUI
 #==============================================================================
-
+    
+    def key(self, event):
+        self.desfazer()
+    
     def createWidgets(self):
         self.canvas = Canvas(self.parent, width=1366, height=768)
         self.scroll = Scrollbar(self.parent, orient="vertical", command=self.canvas.yview)
@@ -91,7 +96,7 @@ class Gui(Frame):
 
         # Menu editar e suas opcoes
         self.menuEditar = Menu(self.menubar)
-        self.menuEditar.add_command(label='Desfazer', underline=0, command=self.desfazer)
+        self.menuEditar.add_command(label='Desfazer     Ctrl+Z', underline=0, command=self.desfazer)
         self.menubar.add_cascade(label="Editar", underline=0, menu=self.menuEditar)
 
         # Menu Imagem e suas opcoes
@@ -1089,6 +1094,7 @@ class Gui(Frame):
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
+
 
 # Cria janela principal
 top = Tk()
