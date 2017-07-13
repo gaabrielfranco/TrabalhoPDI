@@ -1285,5 +1285,5 @@ top.geometry("%dx%d+0+0" % (w,h))
 
 # Executa em loop ate janela ser fechada
 mainw = Gui(parent=top)
-#mainw.master.iconbitmap('imagens\\icon.ico')
+mainw.master.iconbitmap('imagens\\camera.ico')
 mainw.mainloop()
