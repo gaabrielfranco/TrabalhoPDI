@@ -208,6 +208,7 @@ class Gui(Frame):
         self.menuImagem.add_cascade(label='Filtros espaciais', underline=0, menu=self.submenuEspaciais)
         self.menuImagem.add_cascade(label='Filtros no domínio da frequência', underline=0, menu=self.submenuDominioFreq)
         self.menuImagem.add_cascade(label='Limiarização', underline=0, menu=self.submenuLimiarizacao)
+        self.menuImagem.add_command(label='Quantização para k tons de cinza', underline=0, command=self.quantizacaoCluster)
         self.menubar.add_cascade(label="Imagem", underline=0, menu=self.menuImagem)
 
         # Menu de operacoes sobre cores e suas opcoes
@@ -1097,13 +1098,129 @@ class Gui(Frame):
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
 
+    def getRespostaFrequencia(self):
+        self.raioFreq = float(self.escalaFrequencia.get())
+        self.w.destroy()
+
+    def formFrequencia(self):
+        self.raioFreq = None
+        self.raio2Freq = None
+
+        self.w = Toplevel(self)
+        self.w.wm_title("Escolha do raio de corte")
+
+        self.w.geometry("+%d+%d" % (self.winfo_rootx()+50, self.winfo_rooty()+50))
+        self.w.focus_set()
+
+        i = 0
+
+        self.labelFrequencia = Label(self.w, text='Escolha o raio r de corte', width=40)
+        self.labelFrequencia.grid(row=i, column=0)
+        self.escalaFrequencia = Scale(self.w, from_=1, to=255, resolution=0.1, length=350, orient=cte.HORIZONTAL)
+        self.escalaFrequencia.set(0)
+        self.escalaFrequencia.grid(row=i, column=1)
+
+        i+=1
+
+        self.botaoBC = Button(self.w, text='Ok', command=self.getRespostaFrequencia, width=15)
+        self.botaoBC.grid(row=i, column=0, columnspan=2)
+
+        self.w.grid()
+
+    def getRespostaFrequencia2(self):
+        self.raio2Freq = float(self.escalaFrequencia2.get())
+        self.raioFreq = float(self.escalaFrequencia1.get())
+        self.w.destroy()
+
+    def formFrequencia2(self):
+        self.raioFreq = None
+        self.raio2Freq = None
+
+        self.w = Toplevel(self)
+        self.w.wm_title("Escolha do raio de corte")
+
+        self.w.geometry("+%d+%d" % (self.winfo_rootx()+50, self.winfo_rooty()+50))
+        self.w.focus_set()
+
+        i = 0
+
+        self.labelFrequencia1 = Label(self.w, text='Escolha o raio r de corte', width=40)
+        self.labelFrequencia1.grid(row=i, column=0)
+        self.escalaFrequencia1 = Scale(self.w, from_=1, to=255, resolution=0.1, length=350, orient=cte.HORIZONTAL)
+        self.escalaFrequencia1.set(0)
+        self.escalaFrequencia1.grid(row=i, column=1)
+
+        i+=1
+
+        self.labelFrequencia2 = Label(self.w, text='Escolha o segundo raio r de corte', width=40)
+        self.labelFrequencia2.grid(row=i, column=0)
+        self.escalaFrequencia2 = Scale(self.w, from_=1, to=255, resolution=0.1, length=350, orient=cte.HORIZONTAL)
+        self.escalaFrequencia2.set(0)
+        self.escalaFrequencia2.grid(row=i, column=1)
+        i+=1
+
+        self.botaoBC = Button(self.w, text='Ok', command=self.getRespostaFrequencia2, width=15)
+        self.botaoBC.grid(row=i, column=0, columnspan=2)
+
+        self.w.grid()
+
+    def getRespostaBTW(self):
+        self.raioBTW = int(self.escalaBTW.get())
+        self.ordemBTW = int(self.escalaBTW2.get())
+
+        self.w.destroy()
+
+    def formBTW(self):
+        self.raioBTW = None
+
+        self.w = Toplevel(self)
+        self.w.wm_title("Escolha do raio de corte e ordem do filtro")
+
+        self.w.geometry("+%d+%d" % (self.winfo_rootx()+50, self.winfo_rooty()+50))
+        self.w.focus_set()
+
+        i = 0
+
+        self.labelBTW = Label(self.w, text='Escolha o raio r de corte', width=40)
+        self.labelBTW.grid(row=i, column=0)
+        self.escalaBTW = Scale(self.w, from_=1, to=255, resolution=0.1, length=350, orient=cte.HORIZONTAL)
+        self.escalaBTW.set(1)
+        self.escalaBTW.grid(row=i, column=1)
+
+        i+=1
+
+        self.labelBTW2 = Label(self.w, text='Escolha a ordem do filtro', width=40)
+        self.labelBTW2.grid(row=i, column=0)
+        self.escalaBTW2 = Scale(self.w, from_=1, to=50, resolution=1, length=350, orient=cte.HORIZONTAL)
+        self.escalaBTW2.set(1)
+        self.escalaBTW2.grid(row=i, column=1)
+
+        i+=1
+
+        self.botaoBC = Button(self.w, text='Ok', command=self.getRespostaBTW, width=15)
+        self.botaoBC.grid(row=i, column=0, columnspan=2)
+
+        self.w.grid()
+
     def frequencia(self, metodo):
         if self.arqImg.get() == '' or self.img is None:
             tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
         else:
             try:
                 self.imgOld = self.img
-                self.img = Imagem.frequencia(self.img, metodo)
+                if metodo == 'butterworthPB' or metodo == 'butterworthPA':
+                    self.formBTW()
+                    self.wait_window(self.w)
+                    self.img = Imagem.frequencia(self.img, metodo, self.raioBTW, self.ordemBTW) 
+                else:
+                    if metodo == 'passa-faixa':
+                        self.formFrequencia2()
+                        self.wait_window(self.w)
+                    else:
+                        self.formFrequencia()
+                        self.wait_window(self.w)
+
+                    self.img = Imagem.frequencia(self.img, metodo, self.raioFreq, raio2 = self.raio2Freq)
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
@@ -1118,6 +1235,45 @@ class Gui(Frame):
                 self.refreshImg()
             except Exception as e:
                 tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
+
+    def getRespostaCluster(self):
+        self.kNiveis = int(self.escalaCluster.get())
+
+        self.w.destroy()
+
+    def formCluster(self):
+        self.kNiveis = None
+
+        self.w = Toplevel(self)
+        self.w.wm_title("Escolha do número de tons de cinza")
+
+        self.w.focus_set()
+
+        self.labelCluster = Label(self.w, text='Escolha o número k de tons de cinza', width=40)
+        self.labelCluster.grid(row=0, column=0, columnspan=4)
+        self.escalaCluster = Scale(self.w, from_=1, to=255, resolution=1, length=350, orient=cte.HORIZONTAL)
+        self.escalaCluster.set(0)
+        self.escalaCluster.grid(row=1, column=0, columnspan=4)
+        
+        self.botaoBC = Button(self.w, text='Ok', command=self.getRespostaCluster, width=15)
+        self.botaoBC.grid(row=2, column=0, rowspan=2, columnspan=4)
+
+        self.w.grid()
+
+    def quantizacaoCluster(self):
+        if self.arqImg.get() == '' or self.img is None:
+            tkm.showwarning('Aviso', 'Nao ha arquivo aberto')
+        else:
+            try:
+                self.imgOld = self.img
+                self.formCluster()
+                self.wait_window(self.w)
+                self.img = Imagem.quantizacaoCluster(self.img, self.kNiveis)
+                self.refreshImg()
+            except Exception as e:
+                tkm.showerror('Erro', 'O seguinte erro ocorreu: %s' % str(e.args))
+
+                
 
 
 # Cria janela principal

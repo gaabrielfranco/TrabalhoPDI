@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import math
 import random
 from scipy.fftpack import fftshift, ifftshift, fftn, ifftn
+from sklearn.cluster import KMeans
+from sklearn.utils import shuffle
 
 #==============================================================================
 # Classe Imagem: encapsula objeto Image, do modulo PIL
@@ -1117,6 +1119,7 @@ class Imagem(object):
             nova = self.getFromArray(img1)
 
             return nova
+
         elif metodo == 'gaausiana':
             #gerar mascara
             sigma = 1
@@ -1134,6 +1137,7 @@ class Imagem(object):
 
             return nova
         elif metodo == 'mediana':
+
             nova = Imagem((self.altura, self.largura))
 
             for y in range(self.altura):
@@ -1150,6 +1154,7 @@ class Imagem(object):
                     
                     nova[y][x] = (int(np.median(mr)), int(np.median(mg)), int(np.median(mb)))
             return nova
+
         elif metodo == 'conservativa':
             nova = Imagem((self.altura, self.largura))
 
@@ -1177,6 +1182,7 @@ class Imagem(object):
                     else:
                         nova[y][x] = self.img.getpixel((y, x))
             return nova
+
     def espaciais(self, metodo = 'erosao', raio = 1):
         if metodo == 'erosao' or metodo == 'dilatacao':
             nova = Imagem((self.altura, self.largura))
@@ -1332,16 +1338,6 @@ class Imagem(object):
                 T = (u1 + u2) // 2
                 u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0
 
-            for i in range(self.altura):
-                for j in range(self.largura):
-                    r, g, b = self.img.getpixel((i, j))
-                    #Luminosity
-                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
-                    if intensidade >= T:
-                        nova[i][j] = (0, 0, 0)
-                    else:
-                        nova[i][j] = (255, 255, 255)
-
         elif metodo == 'otsu':
             h = self.histograma()
             h = h / (self.altura * self.largura)
@@ -1368,16 +1364,42 @@ class Imagem(object):
                 if vB > vBmax:
                     vBmax = vB
                     T = k
+        elif metodo == 'average':
+            n = 20
 
-            for i in range(self.altura):
-                for j in range(self.largura):
-                    r, g, b = self.img.getpixel((i, j))
-                    #Luminosity
-                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
-                    if intensidade >= T:
-                        nova[i][j] = (0, 0, 0)
-                    else:
-                        nova[i][j] = (255, 255, 255)
+        for i in range(self.altura):
+            for j in range(self.largura):
+                r, g, b = self.img.getpixel((i, j))
+                #Luminosity
+                intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                if intensidade >= T:
+                    nova[i][j] = (0, 0, 0)
+                else:
+                    nova[i][j] = (255, 255, 255)
+
+        return nova
+
+    def quantizacaoCluster(self, nClusters):
+        nova = Imagem((self.altura, self.largura))
+        dados = self.arrLin()
+        paleta = []
+        valores = round(255 / (nClusters - 1))
+
+        for i in range(0, 256, valores):
+            paleta.append([i, i, i])
+            if len(paleta) < nClusters and i + valores > 255 and paleta[len(paleta) - 1] != [255, 255, 255]:
+                paleta.append([255, 255, 255])
+
+        amostraAleatoria = shuffle(dados, random_state=0)[:1000]
+        km = KMeans(nClusters).fit(amostraAleatoria)
+        labels = km.predict(dados)
+
+        for x, label in enumerate(labels):
+            i = x // self.largura
+            j = x % self.largura
+            r, g, b = paleta[label]
+            nova[i][j] = (r ,g, b)
+
         return nova
 
 

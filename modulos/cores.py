@@ -95,6 +95,7 @@ def binaria(img, metodo='padrao', vLimiar=64):
             j = x % img.largura
             r,g,b = paleta[label]
             nova[i][j] = (r,g,b)
+
     elif metodo == 'limiar':
         nova = mudaCor(img, 'luminosity')
         for y in range(nova.altura):
