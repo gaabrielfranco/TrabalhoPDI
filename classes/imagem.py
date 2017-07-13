@@ -1298,50 +1298,86 @@ class Imagem(object):
         return nova
 
     def limiarizacao(self, metodo):
-        #Passo 1 (Estimativa inicial pro limiar T)
-        Tmin = 256; Tmax = -1
         nova = Imagem((self.altura, self.largura))
-        for i in range(self.altura):
-            for j in range(self.largura):
-                r, g, b = self.img.getpixel((i, j))
-                #Luminosity
-                intensidade = 0.299 * r + 0.587 * g + 0.114 * b
-                if intensidade < Tmax:
-                    Tmin = intensidade
-                if intensidade > Tmax:
-                    Tmax = intensidade
-        T = (Tmax + Tmin) // 2
-        #Passo 2, 3, e 4 
-        u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0; nIteracoes = 0; deltaT = 1; Tant = 0
-        while abs(Tant - T) > deltaT:
+        print(metodo)
+        if metodo == 'global':
+            Tmin = 256; Tmax = -1
             for i in range(self.altura):
                 for j in range(self.largura):
                     r, g, b = self.img.getpixel((i, j))
                     #Luminosity
                     intensidade = 0.299 * r + 0.587 * g + 0.114 * b
-                    if intensidade <= T:
-                        u1 += intensidade
-                        n1 += 1
-                    else:
-                        u2 += intensidade
-                        n2 += 1
-            u1 = u1 / n1
-            u2 = u2 / n2
-            nIteracoes += 1
-            Tant = T
-            T = (u1 + u2) // 2
-            u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0
+                    if intensidade < Tmax:
+                        Tmin = intensidade
+                    if intensidade > Tmax:
+                        Tmax = intensidade
+            T = (Tmax + Tmin) // 2
+            u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0; nIteracoes = 0; deltaT = 1; Tant = 0
+            while abs(Tant - T) > deltaT:
+                for i in range(self.altura):
+                    for j in range(self.largura):
+                        r, g, b = self.img.getpixel((i, j))
+                        #Luminosity
+                        intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                        if intensidade <= T:
+                            u1 += intensidade
+                            n1 += 1
+                        else:
+                            u2 += intensidade
+                            n2 += 1
+                u1 = u1 / n1
+                u2 = u2 / n2
+                nIteracoes += 1
+                Tant = T
+                T = (u1 + u2) // 2
+                u1 = 0.0; u2 = 0.0; n1 = 0; n2 = 0
 
-        #Passo 5 (nova Imagem)
-        for i in range(self.altura):
-            for j in range(self.largura):
-                r, g, b = self.img.getpixel((i, j))
-                #Luminosity
-                intensidade = 0.299 * r + 0.587 * g + 0.114 * b
-                if intensidade >= T:
-                    nova[i][j] = (0, 0, 0)
-                else:
-                    nova[i][j] = (255, 255, 255)
+            for i in range(self.altura):
+                for j in range(self.largura):
+                    r, g, b = self.img.getpixel((i, j))
+                    #Luminosity
+                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                    if intensidade >= T:
+                        nova[i][j] = (0, 0, 0)
+                    else:
+                        nova[i][j] = (255, 255, 255)
+
+        elif metodo == 'otsu':
+            print("entrei")
+            h = self.histograma()
+            h = h / (self.altura * self.largura)
+            #Para cada k possível
+            for k in range(0, 256):
+                p1 = 0; p2 = 0; u1 = 0; u2 = 0; ug = 0; ipi1 = 0; ipi2 = 0; vBmax = -1; T = 0;
+                for i in range(0, k+1):
+                    p1 += h[i]
+                    ipi1 += (i * h[i])
+                for i in range(k+1, 256):
+                    p2 += h[i]
+                    ipi2 += (i * h[i])
+                
+                #Evitar divisão por 0
+                p1 += 0.000001
+                p2 += 0.000001
+
+                u1 = ipi1 / p1
+                u2 = ipi2 / p2
+                ug = (p1 * u1) + (p2 * u1)
+
+                vB = (p1 * (u1 - ug) ** 2) + (p2 * (u2 - ug) ** 2)
+                if vB > vBmax:
+                    vBmax = vB
+                    T = k
+
+            for i in range(self.altura):
+                for j in range(self.largura):
+                    r, g, b = self.img.getpixel((i, j))
+                    #Luminosity
+                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+                    if intensidade >= T:
+                        nova[i][j] = (0, 0, 0)
+                    else:
+                        nova[i][j] = (255, 255, 255)
 
         return nova
 
