@@ -1299,7 +1299,7 @@ class Imagem(object):
 
     def limiarizacao(self, metodo):
         nova = Imagem((self.altura, self.largura))
-        print(metodo)
+
         if metodo == 'global':
             Tmin = 256; Tmax = -1
             for i in range(self.altura):
@@ -1343,12 +1343,12 @@ class Imagem(object):
                         nova[i][j] = (255, 255, 255)
 
         elif metodo == 'otsu':
-            print("entrei")
             h = self.histograma()
             h = h / (self.altura * self.largura)
             #Para cada k possível
+            vBmax = -1; T = 0
             for k in range(0, 256):
-                p1 = 0; p2 = 0; u1 = 0; u2 = 0; ug = 0; ipi1 = 0; ipi2 = 0; vBmax = -1; T = 0;
+                p1 = 0; p2 = 0; u1 = 0; u2 = 0; ug = 0; ipi1 = 0; ipi2 = 0;
                 for i in range(0, k+1):
                     p1 += h[i]
                     ipi1 += (i * h[i])
@@ -1362,9 +1362,9 @@ class Imagem(object):
 
                 u1 = ipi1 / p1
                 u2 = ipi2 / p2
-                ug = (p1 * u1) + (p2 * u1)
+                ug = (p1 * u1) + (p2 * u2)
 
-                vB = (p1 * (u1 - ug) ** 2) + (p2 * (u2 - ug) ** 2)
+                vB = (p1 * ((u1 - ug) ** 2)) + (p2 * ((u2 - ug) ** 2))
                 if vB > vBmax:
                     vBmax = vB
                     T = k
@@ -1378,7 +1378,6 @@ class Imagem(object):
                         nova[i][j] = (0, 0, 0)
                     else:
                         nova[i][j] = (255, 255, 255)
-
         return nova
 
 
