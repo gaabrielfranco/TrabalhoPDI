@@ -124,6 +124,7 @@ class Gui(Frame):
         self.submenuLimiarizacao = Menu(self.menuImagem)
         self.submenuLimiarizacao.add_command(label='Global adaptativa', underline=0, command=lambda:self.limiarizacao('global'))
         self.submenuLimiarizacao.add_command(label='Otsu', underline=0, command=lambda:self.limiarizacao('otsu'))
+        self.submenuLimiarizacao.add_command(label='Media móvel', underline=0, command=lambda:self.limiarizacao('average'))
 
         self.submenuDominioFreq = Menu(self.menuImagem)
         self.submenuDominioFreq.add_command(label='Filtro passa-baixa', underline=0, command=lambda:self.frequencia('passa-baixa'))

@@ -1364,8 +1364,38 @@ class Imagem(object):
                 if vB > vBmax:
                     vBmax = vB
                     T = k
+
         elif metodo == 'average':
-            n = 20
+            n = 150; b = 1
+            nova = Imagem((self.altura, self.largura))
+
+            media = 0; quantidade = 0
+            a = []
+
+            for i in range(self.altura):
+                for j in range(self.largura):
+                    quantidade += 1
+                    r, g, b = self.img.getpixel((i, j))
+                    #Luminosity
+                    intensidade = 0.299 * r + 0.587 * g + 0.114 * b
+
+                    a.append(intensidade)
+
+                    media *= n
+
+                    if(quantidade == n + 1):
+                        media -= a.pop(n)
+
+                    media += intensidade
+
+                    media /= n
+                    
+                    if(intensidade >= b * media):
+                        nova[i][j] = (0, 0, 0)
+                    else:
+                        nova[i][j] = (255, 255, 255)
+                    
+            return nova
 
         for i in range(self.altura):
             for j in range(self.largura):
